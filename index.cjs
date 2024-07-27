@@ -1,7 +1,7 @@
 const express = require('express');
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const cors = require('cors');
-const pdf = require('html-pdf-node');
 
 const app = express();
 
@@ -9,24 +9,21 @@ app.use(cors());
 app.use(express.json());
 
 // PDF oluşturma endpoint'i
-app.post('/create-pdf', async (req, res) => {
-    const { htmlContent } = req.body;
-
-    try {
-        // PDF oluşturma için HTML içeriğini hazırlama
-        const options = { format: 'A4' };
-        const file = { content: htmlContent };
-
-        // PDF oluşturma
-        const pdfBuffer = await pdf.generatePdf(file, options);
-
-        // PDF'i kullanıcıya döndürme
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=output.pdf');
-        res.send(pdfBuffer);
-    } catch (error) {
-        res.status(500).send('Bir hata oluştu');
-    }
+app.post('/create-pdf', (req, res) => {
+    const { title, content } = req.body;
+    // Yeni PDF dökümanı oluştur
+    const doc = new PDFDocument();
+    
+    // PDF'i bir dosyaya yaz
+    const filename = `output.pdf`;
+    doc.pipe(fs.createWriteStream(filename));
+    // PDF içeriğini doldur
+    doc.fontSize(25).text(title, 100, 100);
+    doc.fontSize(12).text(content, 100, 150);
+    // PDF'i kapat ve yazmayı bitir
+    doc.end();
+    // PDF'i döndür
+    doc.pipe(res);
 });
 
 // Preflight request'leri için OPTIONS methodunu ele alın
