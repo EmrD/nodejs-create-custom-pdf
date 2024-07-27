@@ -12,7 +12,7 @@ app.post('/create-pdf', (req, res) => {
   const doc = new PDFDocument();
 
   const filename = 'output.pdf';
-  doc.pipe(fs.createWriteStream(filename);
+  doc.pipe(fs.createWriteStream(filename));
 
   doc.fontSize(25).text(title, 100 , 100); 
   doc.fontSize(12).text(content, 100, 200);
