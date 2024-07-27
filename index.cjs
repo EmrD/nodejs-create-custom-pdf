@@ -4,9 +4,8 @@ const fs = require('fs');
 const cors = require('cors');
 
 const app = express();
-const port = 3000;
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
 // PDF oluşturma endpoint'i
@@ -30,6 +29,16 @@ app.post('/create-pdf', (req, res) => {
     // PDF'i döndür
     doc.pipe(res);
 });
+
+// Preflight request'leri için OPTIONS methodunu ele alın
+app.options('/create-pdf', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.send('OK');
+});
+
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
